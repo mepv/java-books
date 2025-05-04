@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  auth-server:
+    build:
+      context: ./auth-server
+      dockerfile: Dockerfile
+    container_name: auth-server
+    ports:
+      - "9000:9000"
+    environment:
+      # Not secure, for POC only. An .env file or Secrets Manager should be used.
+      - USER_PASSWORD=password
+      - CLIENT_ID=07c7d29b-b894-4d55-89dd-fe126f5dda0d
+      - CLIENT_SECRET=secure-secret
+    networks:
+      - spring-network
+
+  resource-server:
+    build:
+      context: ./book-library
+      dockerfile: Dockerfile
+    container_name: book-library
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - JWT_ISSUER_URI=http://auth-server:9000/oauth2/jwks
+    depends_on:
+      - auth-server
+    networks:
+      - spring-network
+
+networks:
+  spring-network:
+    driver: bridge
