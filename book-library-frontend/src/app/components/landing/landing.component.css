@@ -1,0 +1,107 @@
+.landing-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.content {
+  max-width: 1000px;
+  text-align: center;
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  color: #2d3748;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  color: #4a5568;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.features {
+  display: flex;
+  justify-content: space-between;
+  margin: 3rem 0;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.feature {
+  flex: 1;
+  min-width: 250px;
+  padding: 1.5rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.feature:hover {
+  transform: translateY(-5px);
+}
+
+.icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.feature h3 {
+  color: #2d3748;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.feature p {
+  color: #4a5568;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.login-button {
+  background-color: #4C51BF;
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+}
+
+.login-button:hover {
+  background-color: #434190;
+}
+
+.spacer {
+  display: inline-block;
+  width: 20px;
+}
+
+@media (max-width: 768px) {
+  .features {
+    flex-direction: column;
+  }
+
+  .content {
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}

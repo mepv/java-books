@@ -39,6 +39,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -46,6 +47,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -67,10 +69,12 @@ public class SecurityConfig {
     public static final String AUTHOR_VARGAS_LLOSA = "AUTHOR_VARGAS_LLOSA";
     public static final String AUTHOR_GALLEGOS = "AUTHOR_GALLEGOS";
 
-    @Value("${book.library.client-id}")
-    public String clientId;
-    @Value("${book.library.client-secret}")
-    public String clientSecret;
+    @Value("${book.library.spa-client-id}")
+    public String spaClientId;
+    @Value("${book.library.postman-client-id}")
+    public String postmanClientId;
+    @Value("${book.library.postman-client-secret}")
+    public String postmanClientSecret;
     @Value("${book.library.user-password}")
     public String userPassword;
 
@@ -80,6 +84,16 @@ public class SecurityConfig {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer.authorizationServer();
         return http
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                .cors(corsConfig -> corsConfig.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+                    config.setAllowedMethods(Collections.singletonList("*"));
+                    config.setAllowCredentials(true);
+                    config.setAllowedHeaders(Collections.singletonList("*"));
+                    config.setExposedHeaders(List.of("Authorization"));
+                    config.setMaxAge(3600L);
+                    return config;
+                }))
                 .with(authorizationServerConfigurer, authServer -> authServer.oidc(Customizer.withDefaults())) // Enable OpenID Connect 1.0
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
@@ -96,6 +110,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
+                .logout(logout -> logout.logoutSuccessUrl("http://localhost:4200/"))
                 .build();
     }
 
@@ -132,9 +147,9 @@ public class SecurityConfig {
 
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
-        RegisteredClient pkceClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId(clientId)
-                .clientSecret(passwordEncoder().encode(clientSecret))
+        RegisteredClient postmanClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId(postmanClientId)
+                .clientSecret(passwordEncoder().encode(postmanClientSecret))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
@@ -149,7 +164,23 @@ public class SecurityConfig {
                         .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED).build())
                 .build();
 
-        return new InMemoryRegisteredClientRepository(pkceClient);
+        RegisteredClient pkceClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId(spaClientId)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .redirectUri("http://localhost:4200/oauth/callback")
+                .scope(OidcScopes.OPENID)
+                .scope(OidcScopes.EMAIL)
+                .scope("book:write")
+                .scope("book:read")
+                .clientSettings(ClientSettings.builder().requireProofKey(true).build())
+                .tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.ofMinutes(60))
+                        .refreshTokenTimeToLive(Duration.ofHours(8)).reuseRefreshTokens(false)
+                        .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED).build())
+                .build();
+
+        return new InMemoryRegisteredClientRepository(pkceClient, postmanClient);
     }
 
     @Bean

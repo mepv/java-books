@@ -1,0 +1,148 @@
+<div class="book-container">
+  <div class="content">
+    <h1>Librería Java Books</h1>
+    <p>Explora nuestra colección de literatura general.</p>
+
+    <div *ngIf="isAdmin" class="admin-controls">
+      <button class="add-book-button" (click)="toggleBookForm()">
+        {{ showBookForm ? 'Cancelar' : 'Añadir Libro' }}
+      </button>
+    </div>
+
+    <form *ngIf="showBookForm" [formGroup]="bookForm" (ngSubmit)="createBook()" class="book-form">
+      <h2>Añadir Nuevo Libro</h2>
+
+      <div class="form-group">
+        <label for="title">Título</label>
+        <input type="text" id="title" formControlName="title" class="form-control">
+        <div *ngIf="bookForm.get('title')?.touched && bookForm.get('title')?.invalid" class="error-message">
+          <span *ngIf="bookForm.get('title')?.errors?.['required']">El título es obligatorio.</span>
+          <span *ngIf="bookForm.get('title')?.errors?.['minlength']">El título debe tener al menos 3 caracteres.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="author">Autor</label>
+        <input type="text" id="author" formControlName="author" class="form-control">
+        <div *ngIf="bookForm.get('author')?.touched && bookForm.get('author')?.invalid" class="error-message">
+          <span *ngIf="bookForm.get('author')?.errors?.['required']">El autor es obligatorio.</span>
+          <span *ngIf="bookForm.get('author')?.errors?.['minlength']">El autor debe tener al menos 3 caracteres.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="amountPages">Número de Páginas</label>
+        <input type="number" id="amountPages" formControlName="amountPages" class="form-control">
+        <div *ngIf="bookForm.get('amountPages')?.touched && bookForm.get('amountPages')?.invalid" class="error-message">
+          <span *ngIf="bookForm.get('amountPages')?.errors?.['required']">El número de páginas es obligatorio.</span>
+          <span *ngIf="bookForm.get('amountPages')?.errors?.['min']">El libro debe tener al menos 1 página.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Categoría</label>
+        <input type="text" id="category" formControlName="category" class="form-control">
+        <div *ngIf="bookForm.get('category')?.touched && bookForm.get('category')?.invalid" class="error-message">
+          <span *ngIf="bookForm.get('category')?.errors?.['required']">La categoría es obligatoria.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="content">Contenido</label>
+        <textarea id="content" formControlName="content" class="form-control" rows="5"></textarea>
+        <div *ngIf="bookForm.get('content')?.touched && bookForm.get('content')?.invalid" class="error-message">
+          <span *ngIf="bookForm.get('content')?.errors?.['required']">El contenido es obligatorio.</span>
+          <span *ngIf="bookForm.get('content')?.errors?.['minlength']">El contenido debe tener al menos 10 caracteres.</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="submit-button" [disabled]="bookForm.invalid">Guardar Libro</button>
+        <button type="button" class="cancel-button" (click)="toggleBookForm()">Cancelar</button>
+      </div>
+    </form>
+
+    <div class="search-container">
+      <div class="search-controls">
+        <select [(ngModel)]="searchBy" class="search-select">
+          <option value="title">Buscar por Título</option>
+          <option value="author">Buscar por Autor</option>
+        </select>
+
+        <div class="search-input-group">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Ingresa tu búsqueda"
+            class="search-input"
+          >
+          <button (click)="searchBooks()" class="search-button">Buscar</button>
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="filter-group" *ngIf="categories.length > 0">
+          <h3>Categorías</h3>
+          <div class="tags">
+            <span class="tag" *ngFor="let category of categories">
+              {{ category }}
+            </span>
+          </div>
+        </div>
+
+        <div class="filter-group" *ngIf="authors.length > 0">
+          <h3>Autores</h3>
+          <div class="tags">
+            <span class="tag" *ngFor="let author of authors">
+              {{ author }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="book-list" *ngIf="books.length > 0 && !selectedBook && !singleBookResult">
+      <div class="book-card" *ngFor="let book of books" (click)="selectBook(book)">
+        <div class="icon">📘</div>
+        <h3>{{ book.title }}</h3>
+        <p class="author">por {{ book.author }}</p>
+        <p class="description">{{ book.content | slice:0:100 }}...</p>
+        <div class="book-meta">
+          <span class="price">{{ book.amountPages }} páginas</span>
+          <span class="category">{{ book.category }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="books.length === 0 && !singleBookResult && searched" class="no-results">
+      <div class="icon">🔍</div>
+      <h3>No se encontraron libros</h3>
+      <p *ngIf="searchBy === 'author'">No tienes permisos para ver libros de este autor o no existen en nuestro catálogo.</p>
+      <p *ngIf="searchBy !== 'author'">Intenta con otra búsqueda o categoría.</p>
+    </div>
+
+    <div class="book-details" *ngIf="selectedBook">
+      <button class="back-button" (click)="closeDetails()">← Volver</button>
+
+      <div class="detail-content">
+        <h2>{{ selectedBook.title }}</h2>
+        <p class="author">por {{ selectedBook.author }}</p>
+        <div class="detail-meta">
+          <span class="category">{{ selectedBook.category }}</span>
+          <span class="pages">{{ selectedBook.amountPages }} páginas</span>
+        </div>
+
+        <div class="detail-section">
+          <h3>Descripción</h3>
+          <p>{{ selectedBook.content }}</p>
+        </div>
+
+        <div class="actions">
+          <button *ngIf="isAdmin" class="delete-button" (click)="deleteBook(selectedBook.id)">Eliminar</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="logout-button" (click)="logout()">Cerrar sesión</button>
+  </div>
+</div>

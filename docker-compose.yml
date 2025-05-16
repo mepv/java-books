@@ -11,8 +11,9 @@ services:
     environment:
       # Not secure, for POC only. An .env file or Secrets Manager should be used.
       - USER_PASSWORD=password
-      - CLIENT_ID=07c7d29b-b894-4d55-89dd-fe126f5dda0d
-      - CLIENT_SECRET=secure-secret
+      - SPA_CLIENT_ID=c19172df-023f-405e-b422-f05aef5f1e12
+      - POSTMAN_CLIENT_ID=07c7d29b-b894-4d55-89dd-fe126f5dda0d
+      - POSTMAN_CLIENT_SECRET=secure-secret
     networks:
       - spring-network
 
@@ -29,6 +30,21 @@ services:
       - JWT_ISSUER_URI=http://auth-server:9000/oauth2/jwks
     depends_on:
       - auth-server
+    networks:
+      - spring-network
+
+  frontend:
+    build:
+      context: ./book-library-frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "4200:4200"
+    environment:
+      # Not secure, for POC only. This environment variable helps with network connectivity.
+      - DANGEROUSLY_DISABLE_HOST_CHECK=true
+    depends_on:
+      - resource-server
     networks:
       - spring-network
 
