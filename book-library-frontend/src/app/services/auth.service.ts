@@ -157,7 +157,6 @@ export class AuthService {
       const hasWriteScope = scopes.includes('book:write');
 
       this._isAdmin.next(hasWriteScope);
-      localStorage.setItem('isAdmin', hasWriteScope.toString());
     } catch (err) {
       console.error('Error parsing token', err);
       this._isAdmin.next(false);
