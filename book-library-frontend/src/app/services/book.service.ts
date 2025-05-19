@@ -12,6 +12,10 @@ export class BooksService {
 
   constructor(private readonly http: HttpClient) {}
 
+  getTitles(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/titles`);
+  }
+
   getCategories(): Observable<string[]> {
     return this.http.get<string[]>(`${this.apiUrl}/categories`);
   }

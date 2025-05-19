@@ -22,6 +22,7 @@ export class BookComponent implements OnInit {
   searched = false;
   selectedBook: Book | null = null;
   singleBookResult: Book | null = null;
+  titles: string[] = [];
   categories: string[] = [];
   authors: string[] = [];
   bookForm: FormGroup;
@@ -40,6 +41,7 @@ export class BookComponent implements OnInit {
       category: ['', Validators.required],
       content: ['', [Validators.required, Validators.minLength(10)]]
     });
+    this.loadTitles();
     this.loadCategories();
     this.loadAuthors();
   }
@@ -47,6 +49,15 @@ export class BookComponent implements OnInit {
   ngOnInit(): void {
     this.authService.isAdmin.subscribe(isAdmin => {
       this.isAdmin = isAdmin;
+    });
+  }
+
+  loadTitles() {
+    this.booksService.getTitles().subscribe({
+      next: (titles) => {
+        this.titles = titles;
+      },
+      error: (err) => this.handleError(err)
     });
   }
 
@@ -78,6 +89,12 @@ export class BookComponent implements OnInit {
     } else if (this.searchBy === 'author') {
       this.searchByAuthor();
     }
+  }
+
+  searchByTag(type: string, value: string): void {
+    this.searchBy = type;
+    this.searchTerm = value;
+    this.searchBooks();
   }
 
   searchByTitle() {

@@ -90,10 +90,21 @@
           </div>
         </div>
 
+        <div class="filter-group" *ngIf="titles.length > 0">
+          <h3>Libros</h3>
+          <div class="tags">
+            <span class="tag" *ngFor="let title of titles"
+            (click)="searchByTag('title', title)">
+              {{ title }}
+            </span>
+          </div>
+        </div>
+
         <div class="filter-group" *ngIf="authors.length > 0">
           <h3>Autores</h3>
           <div class="tags">
-            <span class="tag" *ngFor="let author of authors">
+            <span class="tag" *ngFor="let author of authors"
+            (click)="searchByTag('author', author)">
               {{ author }}
             </span>
           </div>
