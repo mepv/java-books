@@ -152,9 +152,12 @@ export class BookComponent implements OnInit {
     };
 
     this.booksService.createBook(newBook).subscribe({
-      next: (createdBook) => {
+      next: () => {
         this.toggleBookForm();
         this.searchBooks();
+        this.loadTitles();
+        this.loadAuthors();
+        this.loadCategories();
       },
       error: (err) => this.handleError(err)
     });
