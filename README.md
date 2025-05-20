@@ -82,6 +82,8 @@ authors: [ALL]
 1. Acceder a http://localhost:4200
 2. Iniciar sesión como usuario o administrador
 
+![Alt text](./images/spa.png)
+
 ## Flujo de Autenticación usando Postman
 1. Type: ***OAuth 2.0***
 2. Header Prefix: ***Bearer***
