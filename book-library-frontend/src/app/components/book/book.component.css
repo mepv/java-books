@@ -200,11 +200,21 @@ textarea.form-control {
   background-color: #434190;
 }
 
+.book-list-container {
+  margin: 2rem 0;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .filters {
+  max-width: 1200px;
+  margin: 2rem 0;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1.5rem;
+  padding: 1.5rem;
 }
 
 .filter-group {
@@ -317,8 +327,14 @@ textarea.form-control {
 }
 
 .book-details {
+  max-width: 1200px;
   text-align: left;
   width: 100%;
+  margin: 2rem 0;
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .back-button {
