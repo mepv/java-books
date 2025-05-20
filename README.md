@@ -78,7 +78,11 @@ authors: [ALL]
     docker compose up --build
  ```
 
-## Fujo de Autenticación usando Postman
+## Flujo con un navegador
+1. Acceder a http://localhost:4200
+2. Iniciar sesión como usuario o administrador
+
+## Flujo de Autenticación usando Postman
 1. Type: ***OAuth 2.0***
 2. Header Prefix: ***Bearer***
 3. Grant type: ***Authorization Code (with PKCE)***
